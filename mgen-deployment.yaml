@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mgen-deployment
+spec:
+  replicas: 9
+  selector:
+    matchLabels:
+      app: mgen
+  template:
+    metadata:
+      labels:
+        app: mgen
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - mgen
+              topologyKey: "kubernetes.io/hostname"
+      containers:
+      - name: mgen
+        image: ankh99/mgen-app:latest
+        command: ["python", "app.py"]
+        args: ["$(NODE_IP)"]
+        resources:
+          limits:
+            cpu: "1"
+            memory: "512Mi"
+        env:
+        - name: NODE_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP

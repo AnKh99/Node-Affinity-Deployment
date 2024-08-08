@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: ipp-daemonset
+spec:
+  selector:
+    matchLabels:
+      app: ipp
+  template:
+    metadata:
+      labels:
+        app: ipp
+    spec:
+      hostNetwork: true
+      containers:
+      - name: ipp
+        image: ankh99/ipp-server:latest
+        ports:
+        - containerPort: 5000
